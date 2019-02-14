@@ -4,8 +4,9 @@ const fs = require('fs-extra');
 const { Image } = require('../models');
 const ctrl = {};
 
-ctrl.index = (req, res) => {
-    res.send('Index Page')
+ctrl.index = async (req, res) => {
+    const image = await Image.findOne({ filename: {$regex: req.params.image_id}})
+    res.render('image', {image});
 };
 ctrl.create = (req, res) => {
 
@@ -16,11 +17,10 @@ ctrl.create = (req, res) => {
         if(images.length > 0) {
             savedImage();
         } else {
-            console.log(imgURL);
             const imageTempPath = req.file.path;
             const ext = path.extname(req.file.originalname).toLowerCase();
             const targetPath = path.resolve(`src/public/upload/${imgURL}${ext}`);
-        
+            console.log(targetPath);
             if (ext ==='.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.gif') {
                 await fs.rename(imageTempPath, targetPath);
                 const newImg = new Image({
@@ -28,9 +28,8 @@ ctrl.create = (req, res) => {
                     filename: imgURL + ext,
                     description: req.body.description
                 });
-                const imageSaved = await newImg.save();
-                // res.redirect('/images');
-                res.send('works!');
+                await newImg.save();
+                res.redirect('/images/' + imgURL);
             } else {
                 await fs.unlink(imageTempPath);
                 res.status(500).json({error: 'Solamente imagenes'});
