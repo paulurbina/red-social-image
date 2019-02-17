@@ -1,7 +1,11 @@
+// Modules
 const path = require('path');
-const { randomString } = require('../helpers/libs');
 const fs = require('fs-extra');
+// Helpers / libs
+const { randomString } = require('../helpers/libs');
+// Models
 const { Image } = require('../models');
+// Exports object
 const ctrl = {};
 
 ctrl.index = async (req, res) => {
@@ -45,6 +49,7 @@ ctrl.like = (req, res) => {
     res.send('Index Page')
 };
 ctrl.comment = (req, res) => {
+
     res.send('Index Page')
 };
 ctrl.remove = (req, res) => {
