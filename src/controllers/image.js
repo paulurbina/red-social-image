@@ -58,8 +58,16 @@ ctrl.create = (req, res) => {
     savedImage();
 
 };
-ctrl.like = (req, res) => {
-    res.send('Index Page')
+ctrl.like = async (req, res) => {
+    const image = await Image.findOne({filename: {$regex: req.params.image_id}});
+    if(image) {
+        image.likes = image.likes + 1;
+        await image.save();
+        res.json({like: image.likes});
+    } else {
+        res.status(500).json({error: 'Internal error'});
+        res.redirect('/');
+    }
 };
 ctrl.comment = async (req, res) => {
     const image = await Image.findOne({filename: {$regex: req.params.image_id}});
