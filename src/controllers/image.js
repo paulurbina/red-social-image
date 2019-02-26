@@ -81,8 +81,14 @@ ctrl.comment = async (req, res) => {
         res.redirect('/');
     }
 };
-ctrl.remove = (req, res) => {
-    res.send('Index Page')
+ctrl.remove = async (req, res) => {
+    const image = await Image.findOne({filename: {$regex: req.params.image_id}});
+    if(image) {
+        await fs.unlink(path.resolve('./src/public/upload/' + image.filename));
+        await Comment.deleteOne({image_id: image._id});
+        await image.remove();
+        res.json(true);
+    }
 };
 
 
