@@ -6,20 +6,23 @@ const md5 = require('md5');
 const { randomString } = require('../helpers/libs');
 // Models
 const { Image, Comment } = require('../models');
+// Required the sidebar
+const sidebar = require('../helpers/sidebar');
 // Exports object
 const ctrl = {};
 
 ctrl.index = async (req, res) => {
-    const viewModel = { image: {}, comments: {} };
+    let viewModel = { image: {}, comments: [] };
 
     const image = await Image.findOne({ filename: {$regex: req.params.image_id}});
     if (image) {
-        image.views = image.views + 1;
+        image.views = image.views + 1; // cantidad de vistas
         viewModel.image = image;
-        await image.save();
+        await image.save(); // Guardando las imagenes
         const comments = await Comment.find({image_id: image._id});
         viewModel.comments = comments;
-        res.render('image', {image, comments});
+        viewModel = await sidebar(viewModel);
+        res.render('image', viewModel);
     } else {
         res.redirect('/');
     }
